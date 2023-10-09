@@ -1,0 +1,43 @@
+Backend
+cd folder path 
+
+npx run build
+
+npm run start:dev
+
+
+set env check in seeder
+
+npx ts-node user.ts
+npx ts-node vendor.ts
+no need to run this 
+
+
+
+npx ts-node permission.ts
+npx ts-node role.ts
+npx ts-node admin.ts
+npx ts-node cms.ts
+npx ts-node settings.ts
+npx ts-node serviceType.ts
+npx ts-node assetsUses.ts
+npx ts-node assetsStructureType.ts
+
+npx ts-node assetsFacade.ts
+
+npx ts-node cancelReason.ts
+
+npx ts-node categoriesDispute.ts
+
+npx ts-node assets.ts
+
+
+npx ts-node priority.ts
+npx ts-node ourContactUs.ts
+
+npx ts-node socialMedia.ts
+npx ts-node ourServices.ts
+npx ts-node assetsCategory.ts
+npx ts-node whyMaintenance.ts
+
+
