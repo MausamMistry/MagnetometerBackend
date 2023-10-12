@@ -62,7 +62,7 @@ import cancelReasonValidation from "../validation/admin/cancelReason-validation"
 import user from "../controllers/admin/user";
 import Suggestions from "../controllers/admin/suggestions";
 import ReportRequest from "../controllers/admin/reportRequest";
-import Reviews from "../controllers/customer/reviews";
+import Reviews from "../controllers/user/reviews";
 import CommissionHistory from "../controllers/admin/commissionHistory";
 import PaymentTransaction from "../controllers/admin/paymentTransaction";
 import earning from "../controllers/admin/earning";
@@ -227,7 +227,7 @@ adminRouter.post("/category/change-status", commonValidation.idRequired, categor
 // *******************************************************************************************
 
 // *******************************************************************************************
-// ================================== Start customer Route =======================================
+// ================================== Start user Route =======================================
 // *******************************************************************************************
 
 adminRouter.get("/user/getAll", userService.getAll);
@@ -258,7 +258,7 @@ adminRouter.post("/visit-site/change-status", commonValidation.idRequired, visit
 adminRouter.post("/user/changeUserPassword", userValidation.changePasswordValidation, user.changeUserPassword)
 
 // *******************************************************************************************
-// ================================== End customer Route =========================================
+// ================================== End user Route =========================================
 // *******************************************************************************************
 
 // *******************************************************************************************
@@ -275,7 +275,7 @@ adminRouter.post("/post/change-status", commonValidation.idRequired, postService
 adminRouter.delete("/post/delete-comment", commonValidation.idRequiredQuery, postService.deletePostComment);
 
 // *******************************************************************************************
-// ================================== End customer Route =========================================
+// ================================== End user Route =========================================
 // *******************************************************************************************
 
 // *******************************************************************************************

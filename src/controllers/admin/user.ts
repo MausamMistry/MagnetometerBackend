@@ -378,23 +378,28 @@ const store = (async (req: Request, res: Response) => {
             email,
             profile_photo,
             location,
-            date_of_birth
+            date_of_birth,
+            password,
+            type,
         } = req.body;
         let userData: any = {}
         let message: any
         if (id) {
             userData = await User.findOne({ _id: id });
-            message = 'User' + process.env.APP_UPDATE_MESSAGE;
+            message = 'User update succesfully';
         } else {
             userData = await new User();
-            message = 'User' + process.env.APP_STORE_MESSAGE;
+            message = 'User added succesfully';
             userData.unique_id = uniqid();
         }
+        const passwordHash = await bcrypt.hash(password, Number(10));
         userData.first_name = first_name;
         userData.last_name = last_name;
+        userData.type = type;
         userData.user_name = user_name;
         userData.mobile_no = mobile_no;
         userData.email = email;
+        userData.password = passwordHash;
         userData.profile_photo = profile_photo;
         userData.location = location;
         userData.date_of_birth = date_of_birth;

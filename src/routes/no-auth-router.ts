@@ -1,18 +1,18 @@
 import { Router } from "express";
 import decMiddleware from "../helper/decryptData";
-import customerValidation from "../validation/customer/auth-validation";
+import customerValidation from "../validation/user/auth-validation";
 import commonValidation from "../validation/common-validation";
 import settingService from "../controllers/admin/setting";
 import authAdminService from "../controllers/admin/auth";
-import authCustomerService from "../controllers/customer/auth";
+import authCustomerService from "../controllers/user/auth";
 import commonService from "../controllers/common/common";
 import authValidation from "../validation/admin/auth-validation"
-import userAuthValidation from "../validation/customer/auth-validation"
-import contactValidation from '../validation/customer/contactUs-validation'
-import suggestionValidation from "../validation/customer/suggestion-validation";
-import serviceRequestValidation from "../validation/customer/serviceRequest-validation";
-import serviceRequestService from "../controllers/customer/serviceRequest";
-import trainingMaterialService from "../controllers/customer/trainingMaterial";
+import userAuthValidation from "../validation/user/auth-validation"
+import contactValidation from '../validation/user/contactUs-validation'
+import suggestionValidation from "../validation/user/suggestion-validation";
+import serviceRequestValidation from "../validation/user/serviceRequest-validation";
+import serviceRequestService from "../controllers/user/serviceRequest";
+import trainingMaterialService from "../controllers/user/trainingMaterial";
 // Constants
 const noAuthRouter = Router();
 noAuthRouter.use(decMiddleware.DecryptedData);
