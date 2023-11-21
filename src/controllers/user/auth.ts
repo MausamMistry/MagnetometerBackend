@@ -680,6 +680,8 @@ const getProfile = async (req: Request, res: Response) => {
 	try {
 		// @ts-ignore
 		const user_id = req?.user._id;
+		console.log("user_id", user_id);
+		
 
 		const sendResponse: any = {
 			data: await userDataGet(user_id),

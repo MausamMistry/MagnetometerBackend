@@ -8,8 +8,8 @@ const logger = log4js.getLogger();
 import Admin from '../../models/admin-model';
 import AdminToken from '../../models/admin-token-model';
 import User from '../../models/user-model';
-import Category from '../../models/category-model';
-import Post from '../../models/post-model';
+// import Category from '../../models/category-model';
+// import Post from '../../models/post-model';
 import OtpModel from "../../models/otp-model";
 import CommonFunction from "../../helper/commonFunction";
 import MyEarning from "../../models/my-earning-model";
@@ -191,6 +191,7 @@ const adminsDataGet = (async (id: any) => {
     return adminData;
 })
 const login = (async (req: Request, res: Response) => {
+
     try {
         const { email, password, firebase_token } = req.body;
         const adminData: any = await Admin.findOne({
@@ -295,6 +296,7 @@ const changePassword = (async (req: Request, res: Response) => {
 })
 
 const getProfile = (async (req: Request, res: Response) => {
+    
     try {
         // @ts-ignore
         const admin_id = req?.admin?._id;
@@ -305,6 +307,7 @@ const getProfile = (async (req: Request, res: Response) => {
             data: adminData,
             message: process.env.APP_PROFILE_GET_MESSAGE,
         }
+
         return response.sendSuccess(req, res, sendResponse);
     } catch (err: any) {
         const sendResponse: any = {

@@ -63,7 +63,7 @@ import user from "../controllers/admin/user";
 import Suggestions from "../controllers/admin/suggestions";
 import ReportRequest from "../controllers/admin/reportRequest";
 import Reviews from "../controllers/user/reviews";
-import CommissionHistory from "../controllers/admin/commissionHistory";
+import CommissionHistory from "../controllers/admin/CommissionHistory";
 import PaymentTransaction from "../controllers/admin/paymentTransaction";
 import earning from "../controllers/admin/earning";
 import myServices from "../controllers/admin/myServices";

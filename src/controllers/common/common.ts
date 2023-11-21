@@ -1955,24 +1955,27 @@ function replaceMulti(haystack: any, needle: any, replacement: any) {
 }
 
 const getCms = async (req: Request, res: Response) => {
+    
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        let slug: any = req.query.slug;
+        
+        let slug: any = req.query.slug || "";
         slug = slug.replace(
             /\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|/gi,
             ""
         );
         slug = replaceMulti(slug, '-', '_')
         const cmsData: any = await Cms.aggregate([{ $match: { key: slug } }]);
-
+            
         await session.commitTransaction();
         await session.endSession();
         const responseData: any = {
             message: process.env.APP_CMS_GET,
             data: cmsData[0],
         };
-        return response.sendSuccess(req, res, responseData);
+        
+        return response.sendSuccess(req, res, JSON.stringify(responseData));
     } catch (err: any) {
         const sendResponse: any = {
             message: err.message,

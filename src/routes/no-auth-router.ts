@@ -13,6 +13,8 @@ import suggestionValidation from "../validation/user/suggestion-validation";
 import serviceRequestValidation from "../validation/user/serviceRequest-validation";
 import serviceRequestService from "../controllers/user/serviceRequest";
 import trainingMaterialService from "../controllers/user/trainingMaterial";
+import sensorReqService from "../controllers/user/sensor";
+
 // Constants
 const noAuthRouter = Router();
 noAuthRouter.use(decMiddleware.DecryptedData);
@@ -24,7 +26,7 @@ noAuthRouter.post("/admin/reset-password", authValidation.resetPassword, authAdm
 // Customer NOAuth Route Start
 noAuthRouter.post("/user/login", customerValidation.login, authCustomerService.login);
 noAuthRouter.post("/user/register", customerValidation.register, authCustomerService.register);
-// noAuthRouter.post("/user/register",authCustomerService.register)
+// noAuthRouter.post("/user/register",authCustomerService.register);
 noAuthRouter.post("/user/forget-password", userAuthValidation.emailValidation, authCustomerService.forgetPassword);
 noAuthRouter.post("/user/reset-password", userAuthValidation.resetPassword, authCustomerService.resetPassword);
 
@@ -54,6 +56,10 @@ noAuthRouter.post("/check-field", commonValidation.fieldExistValidation, commonS
 
 noAuthRouter.get("/training-material/get", trainingMaterialService.get);
 
+
+// sensor api
+noAuthRouter.post('/add-sensor-data', sensorReqService.store);
+noAuthRouter.get('/get-sensor', sensorReqService.getSensorData);
 
 
 // Export default
