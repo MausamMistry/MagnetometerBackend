@@ -4,6 +4,7 @@ import response from '../../helper/responseMiddleware';
 import log4js from "log4js";
 const logger = log4js.getLogger();
 import User from '../../models/user-model';
+import SubAdminModal from '../../models/sub-admin-model';
 import bcrypt from 'bcrypt'
 import uniqid from 'uniqid'
 
@@ -20,13 +21,13 @@ const allFiled = [
     "_id",
     "first_name",
     "last_name",
-    "user_name",
+    // "user_name",
     "mobile_no",
     "email",
-    "type",
+    // "type",
     "profile_photo",
-    "location",
-    "date_of_birth",
+    // "location",
+    // "date_of_birth",
     "password",
     "unique_id",
     "is_active",
@@ -61,9 +62,9 @@ const getAll = (async (req: Request, res: Response) => {
                     "_id": 1,
                     "first_name": 1,
                     "last_name": 1,
-                    "user_name": 1,
-                    "type": 1,
-                    "mobile_no": 1,
+                    // "user_name": 1,
+                    // "type": 1,
+                    // "mobile_no": 1,
                     "email": 1,
                     "profile_photo": 1,
                     "location": 1,
@@ -72,7 +73,7 @@ const getAll = (async (req: Request, res: Response) => {
             },
         ]);
         const sendResponse: any = {
-            message: 'User' + process.env.APP_GET_MESSAGE,
+            message: 'Sub-admin' + process.env.APP_GET_MESSAGE, // User
             data: userData.length > 0 ? userData : {},
         };
         await session.commitTransaction();
@@ -82,7 +83,7 @@ const getAll = (async (req: Request, res: Response) => {
         const sendResponse: any = {
             message: err.message,
         }
-        logger.info('User' + process.env.APP_GET_MESSAGE);
+        logger.info('Sub-admin' + process.env.APP_GET_MESSAGE);
         logger.info(err);
         await session.abortTransaction();
         session.endSession();
@@ -235,7 +236,7 @@ const destroy = (async (req: Request, res: Response) => {
 // *******************************************************************************************
 
 const getData = (async (id: number) => {
-    const userData: any = await User.aggregate([
+    const userData: any = await SubAdminModal.aggregate([   // User
         { $match: { "_id": new mongoose.Types.ObjectId(id) } },
         { $project: project },
     ]);
@@ -373,36 +374,38 @@ const store = (async (req: Request, res: Response) => {
         const {
             first_name,
             last_name,
-            user_name,
+            // user_name,
             mobile_no,
             email,
             profile_photo,
-            location,
-            date_of_birth,
+            role_id,
+            // location,
+            // date_of_birth,
             password,
-            type,
+            // type,
         } = req.body;
         let userData: any = {}
         let message: any
         if (id) {
-            userData = await User.findOne({ _id: id });
-            message = 'User update succesfully';
+            userData = await SubAdminModal.findOne({ _id: id });  // await User.findOne({ _id: id });
+            message = 'Sub-admin update succesfully'; // 'User update succesfully';
         } else {
-            userData = await new User();
-            message = 'User added succesfully';
+            userData = await new SubAdminModal(); // await new User();
+            message = 'Sub-admin added succesfully';  // 'User added succesfully';
             userData.unique_id = uniqid();
         }
         const passwordHash = await bcrypt.hash(password, Number(10));
         userData.first_name = first_name;
         userData.last_name = last_name;
-        userData.type = type;
-        userData.user_name = user_name;
+        // userData.type = type;
+        // userData.user_name = user_name;
         userData.mobile_no = mobile_no;
         userData.email = email;
         userData.password = passwordHash;
         userData.profile_photo = profile_photo;
-        userData.location = location;
-        userData.date_of_birth = date_of_birth;
+        userData.role_id = role_id;
+        // userData.location = location;
+        // userData.date_of_birth = date_of_birth;
         await userData.save();
         await session.commitTransaction();
         await session.endSession();
@@ -416,10 +419,12 @@ const store = (async (req: Request, res: Response) => {
         const sendResponse: any = {
             message: err.message,
         }
-        logger.info('User' + process.env.APP_STORE_MESSAGE);
+        logger.info('Sub-admin' + process.env.APP_STORE_MESSAGE);
         logger.info(err);
         await session.abortTransaction();
         session.endSession();
+        console.log("sendResponse", sendResponse);
+        
         return response.sendError(res, sendResponse);
     }
 })

@@ -10,9 +10,9 @@ const store = async (req: Request, res: Response, next: NextFunction) => {
         "email": "required|string|email|exist:users,email," + id,
         "first_name": "required|string",
         "last_name": "required|string",
-        "user_name": "required|string|exist:users,user_name," + id,
-        // "mobile_no": "required|string|exist:users,mobile_no," + id,
-        // password: "required|string",
+        // "user_name": "required|string|exist:users,user_name," + id,
+        "mobile_no": "required|string|exist:users,mobile_no," + id,
+        password: "required|string",
     }
     validator.validatorUtilWithCallback(validationRule, {}, req, res, next);
 }
