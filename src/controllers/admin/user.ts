@@ -27,21 +27,21 @@ const allFiled = [
     "mobile_no",
     "email",
     // "type",
-    "profile_photo",
+    // "profile_photo",
     // "location",
     // "date_of_birth",
-    "password",
+    // "password",
     "unique_id",
     "is_active",
-    "email_is_active",
-    "firebase_is_active",
-    "current_commission",
-    "commission_sing",
-    "createdAt",
-    "company_name",
-    "upload_brochure",
-    "serviceTypeData._id",
-    "serviceTypeData.name",
+    // "email_is_active",
+    // "firebase_is_active",
+    // "current_commission",
+    // "commission_sing",
+    // "createdAt",
+    // "company_name",
+    // "upload_brochure",
+    // "serviceTypeData._id",
+    // "serviceTypeData.name",
 ]
 let project: any = {}
 
@@ -93,7 +93,7 @@ const getAll = (async (req: Request, res: Response) => {
 
 })
 
-const get = (async (req: Request, res: Response) => {
+const get = (async (req: Request, res: Response) => {    
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -102,8 +102,8 @@ const get = (async (req: Request, res: Response) => {
             type: type,
         };
         let filter: any = req.query.search;
-        filter = filter.replace(" 91", "");
-        filter = filter.replace("%", "");
+        filter = filter ? filter.replace(" 91", "") : "";
+        filter = filter ? filter.replace("%", "") : "";
 
         let filterTextValue: any = filter;
         let orders: any = {};
@@ -143,19 +143,19 @@ const get = (async (req: Request, res: Response) => {
             console.log(filterText)
         }
 
-        const userData: any = await User.aggregate([
+        const userData: any = await SubAdminModal.aggregate([
 
-            {
-                $lookup: {
-                    from: "service_types",
-                    localField: "service_type_id",
-                    foreignField: "_id",
-                    as: "serviceTypeData",
-                },
-            },
-            {
-                $unwind: { path: "$serviceTypeData", preserveNullAndEmptyArrays: true },
-            },
+            // {
+            //     $lookup: {
+            //         from: "service_types",
+            //         localField: "service_type_id",
+            //         foreignField: "_id",
+            //         as: "serviceTypeData",
+            //     },
+            // },
+            // {
+            //     $unwind: { path: "$serviceTypeData", preserveNullAndEmptyArrays: true },
+            // },
             {
                 $addFields: {
                     "_id": { $toString: "$_id" }
@@ -185,6 +185,7 @@ const get = (async (req: Request, res: Response) => {
                 },
             },
         ]);
+        
         const sendResponse: any = {
             message: 'Sub-admin' + process.env.APP_GET_MESSAGE,
             data: userData.length > 0 ? userData[0] : {},
@@ -213,9 +214,9 @@ const destroy = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        await User.deleteMany({ _id: req.query.id, })
+        await SubAdminModal.deleteMany({ _id: req.query.id, })
         const responseData: any = {
-            message: 'User' + process.env.APP_DELETE_MESSAGE,
+            message: 'Sub-admin' + process.env.APP_DELETE_MESSAGE,
             data: {},
         };
         await session.commitTransaction();
@@ -225,7 +226,7 @@ const destroy = (async (req: Request, res: Response) => {
         const sendResponse: any = {
             message: err.message,
         }
-        logger.info('User' + process.env.APP_DELETE_MESSAGE);
+        logger.info('Sub-admin' + process.env.APP_DELETE_MESSAGE);
         logger.info(err);
         await session.abortTransaction();
         session.endSession();
@@ -397,7 +398,6 @@ const store = (async (req: Request, res: Response) => {
             mobile_no,
             email,
             profile_photo,
-            role_id,
             // location,
             // date_of_birth,
             password,
@@ -422,7 +422,7 @@ const store = (async (req: Request, res: Response) => {
         userData.email = email;
         userData.password = passwordHash;
         userData.profile_photo = profile_photo;
-        userData.role_id = role_id;
+        userData.role_id = "655f27ae004a47ef16f2770c";
         // userData.location = location;
         // userData.date_of_birth = date_of_birth;
         await userData.save();
