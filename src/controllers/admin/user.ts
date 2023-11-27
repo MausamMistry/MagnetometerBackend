@@ -4,8 +4,8 @@ import response from '../../helper/responseMiddleware';
 import log4js from "log4js";
 const logger = log4js.getLogger();
 import User from '../../models/user-model';
-import SubAdminModal from '../../models/sub-admin-model';
-// import SensorModel from '../../models/sensor-model';
+import AdminsModel from '../../models/admin-model';
+import RoleModel from '../../models/role-model';
 import { sendPushNotification } from '../../helper/firebase';
 import bcrypt from 'bcrypt'
 import uniqid from 'uniqid'
@@ -57,24 +57,21 @@ const getAll = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        const userData: any = await SubAdminModal.aggregate([
+        const userData: any = await AdminsModel.aggregate([
             {
                 $project: {
                     "_id": 1,
                     "first_name": 1,
                     "last_name": 1,
-                    // "user_name": 1,
-                    // "type": 1,
                     "mobile_no": 1,
                     "email": 1,
                     "profile_photo": 1,
-                    // "location": 1,
                     "is_active": 1,
                 }
             },
         ]);
         const sendResponse: any = {
-            message: 'Sub-admin' + ' ' + process.env.APP_GET_MESSAGE, // User
+            message: 'Sub-admin' + ' ' + process.env.APP_GET_MESSAGE,
             data: userData.length > 0 ? userData : {},
         };
         await session.commitTransaction();
@@ -143,7 +140,7 @@ const get = (async (req: Request, res: Response) => {
             console.log(filterText)
         }
 
-        const userData: any = await SubAdminModal.aggregate([
+        const userData: any = await AdminsModel.aggregate([
 
             // {
             //     $lookup: {
@@ -187,7 +184,7 @@ const get = (async (req: Request, res: Response) => {
         ]);
         
         const sendResponse: any = {
-            message: 'Sub-admin' + process.env.APP_GET_MESSAGE,
+            message: process.env.APP_GET_MESSAGE,
             data: userData.length > 0 ? userData[0] : {},
         };
         await session.commitTransaction();
@@ -197,7 +194,7 @@ const get = (async (req: Request, res: Response) => {
         const sendResponse: any = {
             message: err.message,
         }
-        logger.info('Sub-admin' + process.env.APP_GET_MESSAGE);
+        logger.info('admin' + process.env.APP_GET_MESSAGE);
         logger.info(err);
         await session.abortTransaction();
         session.endSession();
@@ -214,7 +211,7 @@ const destroy = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        await SubAdminModal.deleteMany({ _id: req.query.id, })
+        await AdminsModel.deleteMany({ _id: req.query.id, })
         const responseData: any = {
             message: 'Sub-admin' + process.env.APP_DELETE_MESSAGE,
             data: {},
@@ -239,10 +236,11 @@ const destroy = (async (req: Request, res: Response) => {
 // *******************************************************************************************
 
 const getData = (async (id: number) => {
-    const userData: any = await SubAdminModal.aggregate([   // User
+    const userData: any = await AdminsModel.aggregate([
         { $match: { "_id": new mongoose.Types.ObjectId(id) } },
         { $project: project },
     ]);
+    
     return userData.length > 0 ? userData[0] : {};
 });
 
@@ -389,42 +387,38 @@ const changeStatusEmail = (async (req: Request, res: Response) => {
 const store = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
+    var roleData: any = await RoleModel.findOne({ 'name': 'admin' });
+    
     try {
         let id: number = req.body.id;
         const {
             first_name,
             last_name,
-            // user_name,
             mobile_no,
             email,
             profile_photo,
-            // location,
-            // date_of_birth,
             password,
-            // type,
         } = req.body;
         let userData: any = {}
         let message: any
         if (id) {
-            userData = await SubAdminModal.findOne({ _id: id });  // await User.findOne({ _id: id });
-            message = 'Sub-admin update succesfully'; // 'User update succesfully';
+            userData = await AdminsModel.findOne({ _id: id });
+            message = 'Sub-admin update succesfully';
         } else {
-            userData = await new SubAdminModal(); // await new User();
-            message = 'Sub-admin added succesfully';  // 'User added succesfully';
+            userData = await new AdminsModel();
+            message = 'Sub-admin added succesfully';
             userData.unique_id = uniqid();
         }
         const passwordHash = await bcrypt.hash(password, Number(10));
         userData.first_name = first_name;
         userData.last_name = last_name;
-        // userData.type = type;
-        // userData.user_name = user_name;
+        userData.is_admin = roleData.guard_name;
         userData.mobile_no = mobile_no;
         userData.email = email;
         userData.password = passwordHash;
         userData.profile_photo = profile_photo;
-        userData.role_id = "655f27ae004a47ef16f2770c";
-        // userData.location = location;
-        // userData.date_of_birth = date_of_birth;
+        userData.role_id = roleData._id;
+
         await userData.save();
         await session.commitTransaction();
         await session.endSession();
@@ -432,6 +426,7 @@ const store = (async (req: Request, res: Response) => {
             message: message,
             data: await getData(userData._id),
         };
+        
         return response.sendSuccess(req, res, responseData);
 
     } catch (err: any) {
@@ -442,8 +437,6 @@ const store = (async (req: Request, res: Response) => {
         logger.info(err);
         await session.abortTransaction();
         session.endSession();
-        console.log("sendResponse", sendResponse);
-        
         return response.sendError(res, sendResponse);
     }
 })

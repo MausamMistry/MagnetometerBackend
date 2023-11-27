@@ -52,34 +52,44 @@ const seedDB = async () => {
                     parent: modelName,
                 },
             );
-
         })
+
         let PerData: any = [];
         await dataColletion.forEach((element: any, indexx: any) => {
             let moduleName = element.name.replace('_', ' ');
             // moduleName = moduleName.charAt(0).toUpperCase();
             const str = moduleName;
-            //split the above string into an array of strings 
+            //split the above string into an array of strings
             //whenever a blank space is encountered
             const dataColletion = str.split(" ");
             //loop through each element of the array and capitalize the first letter.
             for (var i = 0; i < dataColletion.length; i++) {
                 dataColletion[i] = dataColletion[i].charAt(0).toUpperCase() + dataColletion[i].slice(1);
             }
-            //Join all the elements of the array back into a string 
-            //using a blankspace as a separator 
+            //Join all the elements of the array back into a string
+            //using a blankspace as a separator
             const str2 = dataColletion.join(" ");
+            
             PerData.push({
                 name: element.name,
                 position: element.position,
                 parent: element.parent,
                 module: str2,
-                guard_name: "admins",
+                guard_name: element.name == "subadmin_view" ? "admins || sub-admin" : "admins",
                 createdAt: new Date(),
                 updated_at: new Date(),
             })
         });
-
+        PerData.push({
+            name: "notification",
+            position: PerData.length + 1,
+            parent: "notification",
+            module: "notification",
+            guard_name: "sub-admin",
+            createdAt: new Date(),
+            updated_at: new Date(),
+        })
+        
         await Permission.deleteMany({});
         await Permission.create(PerData);
     }

@@ -1950,9 +1950,9 @@ const getRecentPost = async (req: Request, res: Response) => {
     }
 };
 
-function replaceMulti(haystack: any, needle: any, replacement: any) {
-    return haystack.split(needle).join(replacement);
-}
+// function replaceMulti(haystack: any, needle: any, replacement: any) {
+//     return haystack.split(needle).join(replacement);
+// }
 
 const getCms = async (req: Request, res: Response) => {
     
@@ -1960,22 +1960,23 @@ const getCms = async (req: Request, res: Response) => {
     session.startTransaction();
     try {
         
-        let slug: any = req.query.slug || "";
-        slug = slug.replace(
-            /\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|/gi,
-            ""
-        );
-        slug = replaceMulti(slug, '-', '_')
-        const cmsData: any = await Cms.aggregate([{ $match: { key: slug } }]);
-            
+        // let slug: any = req.query.slug || "";
+        // slug = slug.replace(
+        //     /\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|/gi,
+        //     ""
+        // );
+        // slug = replaceMulti(slug, '-', '_')
+        // const cmsData: any = await Cms.aggregate([{ $match: { key: slug } }]);
+        const cmsData: any = await Cms.find({});
+        
         await session.commitTransaction();
         await session.endSession();
         const responseData: any = {
             message: process.env.APP_CMS_GET,
-            data: cmsData[0],
+            data: cmsData,
         };
-        
-        return response.sendSuccess(req, res, JSON.stringify(responseData));
+
+        return response.sendSuccess(req, res, responseData);
     } catch (err: any) {
         const sendResponse: any = {
             message: err.message,
