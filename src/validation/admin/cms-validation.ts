@@ -3,10 +3,10 @@ import validator from "../validate_";
 
 const store = async (req: Request, res: Response, next: NextFunction) => {
     const validationRule = {
-        "our_services": "required",
-        "vision": "required",
-        "mission": "required",
-        "brochure": "required",
+        "info": "required",
+        "calibration": "required",
+        "vibration": "required",
+        "settings": "required",
     }
     validator.validatorUtilWithCallback(validationRule, {}, req, res, next);
 }
