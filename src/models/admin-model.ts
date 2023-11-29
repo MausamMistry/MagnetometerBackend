@@ -11,7 +11,8 @@ export interface IAdminModel {
     is_admin: string;
     role_id: mongoose.Types.ObjectId;   
     is_active: boolean;
-    mobile_no : string;  
+    mobile_no : string;
+    updated_by: string
 }
 
 const schema = new Schema<IAdminModel>(
@@ -24,7 +25,8 @@ const schema = new Schema<IAdminModel>(
         is_admin: { type: String },
         role_id: { type: Schema.Types.Mixed, required: true },     
         is_active: { type: Boolean, default: false }, 
-        mobile_no:{type:String}    
+        mobile_no:{ type: String },
+        updated_by: { type: String }
     },
     {
         timestamps: true
