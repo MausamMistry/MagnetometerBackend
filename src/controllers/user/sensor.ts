@@ -8,6 +8,31 @@ import SensorModel from "../../models/sensor-model";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ===========================================  sensor Create on sensot Request =====================================//
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const allFiled = [
+    "_id",
+    "devicetoken",
+    "sensordata",
+    "address"
+]
+let project: any = {}
+
+const getAllFiled = async () => {
+    await allFiled.map(function async(item: any) {
+        project[item] = 1;
+    })
+}
+
+getAllFiled();
+
+
+const getData = (async (devicetoken: any) => {
+    const sensorDatas: any = await SensorModel.aggregate([
+        { $match: { "devicetoken": devicetoken } },
+        { $project: project }
+    ]);    
+    return sensorDatas.length > 0 ? sensorDatas[0] : {};
+});
+
 
 const store = async (req: any, res: Response) => {
     const session = await mongoose.startSession();
@@ -16,31 +41,69 @@ const store = async (req: any, res: Response) => {
 
         const {
             sensordata,
+            address,
             devicetoken
         } = req.body;
-        
+
         const sensorData = {
             sensordata: sensordata,
+            address: address,
             devicetoken: devicetoken
         }
-        const sensorReq: any = await SensorModel.create(sensorData);
 
-        if (!sensorReq) {
-            const sendResponse: any = {
-                message: process.env.APP_SR_NOT_MESSAGE,
-            };
-            return response.sendError(res, sendResponse);
+        if (devicetoken) {
+
+            const data = await getData(devicetoken);
+            if (Object.keys(data).length !== 0 && data.constructor === Object) {
+                const updateData: any = [];
+                data.sensordata.map((key: any) => {
+                    updateData.push(key);
+                })
+                sensordata.map((key: any) => {
+                    updateData.push(key);
+                })
+                
+                await SensorModel.findOneAndUpdate({devicetoken: devicetoken}, { $set: { sensordata: updateData, address: address ? address :  data.address }});
+                const responseData = {
+                    message: process.env.APP_SUCCESS_MESSAGE,
+                    data: await getData(devicetoken)
+                };
+
+                await session.commitTransaction();
+                session.endSession();
+                return response.sendSuccess(req, res, responseData);
+                
+            } else {
+                const sensorReq: any = await SensorModel.create(sensorData);
+                if (!sensorReq) {
+                    const sendResponse: any = {
+                        message: process.env.APP_SR_NOT_MESSAGE,
+                    };
+                    return response.sendError(res, sendResponse);
+                }
+                const responseData = {
+                    message: process.env.APP_SUCCESS_MESSAGE,
+                    data: sensorReq
+                };
+
+                await session.commitTransaction();
+                session.endSession();
+                return response.sendSuccess(req, res, responseData);
+            }
+
+            // const responseData: any = {
+            //     message: 'Sensor data' + process.env.APP_UPDATE_MESSAGE,
+            //     data: await getData(devicetoken),
+            // };
+            // await session.commitTransaction();
+            // session.endSession();
+            // return response.sendSuccess(req, res, responseData);
+
         }
 
-        const responseData = {
-            message: process.env.APP_SUCCESS_MESSAGE,
-            data: sensorReq
-        };
+        // await session.commitTransaction();
+        // await session.endSession();
 
-
-        await session.commitTransaction();
-        await session.endSession();
-        return response.sendSuccess(req, res, responseData);
     } catch (err: any) {
         const sendResponse: any = {
             message: err.message,
@@ -57,31 +120,31 @@ const getSensorData = async (req: any, res: Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { devicetoken } = req.body;
+        const { devicetoken, address } = req.body;
 
         const matchStage = {
-            $match: { devicetoken: devicetoken }
+            $match: { $or: [{ devicetoken: devicetoken }, { address: address }] }
         };
+
         const pipeline = [
-            matchStage,
+            matchStage
         ];
 
         let sensorData = await SensorModel.aggregate(pipeline).exec();
         sensorData = JSON.parse(JSON.stringify(sensorData));
-        
+
         if (!sensorData[0]) {
             const responseData: any = {
-                message: "Data not Found with this token",
+                message: "Data not Found.",
             };
             return await response.sendError(res, responseData);
         }
 
-
         const responseData: any = {
             message: "Sensor Details get successfully",
-            data: sensorData[0],
+            data: sensorData,
         };
-        
+
         return await response.sendSuccess(req, res, responseData);
     } catch (err: any) {
         const sendResponse: any = {

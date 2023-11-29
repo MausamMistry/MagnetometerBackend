@@ -4,17 +4,18 @@ import mongoose, { model, Schema } from "mongoose";
 export interface ISensorModel {
     _id: mongoose.Types.ObjectId;
     user_id: mongoose.Types.ObjectId;
-    sensordata: string;
+    sensordata: {}[];
     devicetoken: string;
+    address: string;
     updated_by:string
-
 }
 
 const schema = new Schema<ISensorModel>(
     {
         user_id: { type: Schema.Types.Mixed },
-        sensordata: { type: String },
+        sensordata: { type: Schema.Types.Mixed },
         devicetoken: { type: String },
+        address: { type: String },
         updated_by:{ type: String }
     },
     {

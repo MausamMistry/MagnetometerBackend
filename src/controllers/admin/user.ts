@@ -553,36 +553,6 @@ const sendNotification = (async (req: Request, res: Response) => {
     session.startTransaction();
     try {
         const token = req.body.token;
-
-        // const { type, sort_field, sort_direction } = req.query;
-        // let filterText: object = {};
-        // if (type) {
-        //     filterText = {
-        //         ...filterText,
-        //         type: type
-        //     };
-        // }
-
-        // let orders: any = {};
-        // if (sort_field) {
-        //     orders[sort_field as string] = sort_direction == "ascend" ? 1 : -1;
-        // } else {
-        //     orders = { 'createdAt': -1 };
-        // }
-        // const sensorData: any = await SensorModel.aggregate([
-        //     // { $match: filterText },
-        //     // { $sort: orders },
-        //     {
-        //         $project: {
-        //             "_id": 1,
-        //             "sensordata": 1,
-        //             "devicetoken": 1,
-        //             "is_active": 1,
-        //         }
-        //     },
-        // ]);
-
-        // const data = await getSensorData(token);
         
         const notification = await sendPushNotification(token, {});
         const sendResponse: any = {
@@ -604,7 +574,6 @@ const sendNotification = (async (req: Request, res: Response) => {
         session.endSession();
         return response.sendError(res, sendResponse);
     }
-
 })
 
 // Export default

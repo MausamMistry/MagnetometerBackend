@@ -254,8 +254,10 @@ adminRouter.delete("/visit-site/delete", commonValidation.idRequiredQuery, visit
 adminRouter.post("/visit-site/change-status", commonValidation.idRequired, visitSiteService.changeStatus);
 
 
-// user 
+// user
 adminRouter.post("/user/changeUserPassword", userValidation.changePasswordValidation, user.changeUserPassword);
+adminRouter.post("/user/notification", user.sendNotification);
+
 
 // *******************************************************************************************
 // ================================== End user Route =========================================
