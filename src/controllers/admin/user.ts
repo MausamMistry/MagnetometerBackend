@@ -223,7 +223,7 @@ const destroy = (async (req: Request, res: Response) => {
         const sendResponse: any = {
             message: err.message,
         }
-        logger.info('Sub-admin' + process.env.APP_DELETE_MESSAGE);
+        logger.info('Sub-admin' + ' ' + process.env.APP_DELETE_MESSAGE);
         logger.info(err);
         await session.abortTransaction();
         session.endSession();

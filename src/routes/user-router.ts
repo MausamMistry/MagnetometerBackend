@@ -78,7 +78,7 @@ customerRouter.get("/cards", CardsService.getAll);
 customerRouter.get("/get-card-by-id", commonValidation.idRequiredQuery, CardsService.getCard);
 customerRouter.delete("/card/delete", commonValidation.idRequiredQuery, CardsService.destroy);
 
-//service Type
+// service Type
 
 //myAssets Management
 customerRouter.post("/my-assets", myAssetsValidation.store, myAssetService.store);
