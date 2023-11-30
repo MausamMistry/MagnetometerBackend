@@ -69,6 +69,7 @@ import earning from "../controllers/admin/earning";
 import myServices from "../controllers/admin/myServices";
 import whyMaintenance from "../controllers/admin/whyMaintenance";
 import whyMaintenanceValidation from "../validation/admin/whyMaintenance-validation";
+import sensor from "../controllers/user/sensor";
 
 // Constants
 const adminRouter = Router();
@@ -395,6 +396,10 @@ adminRouter.get("/payment-transaction", PaymentTransaction.get)
 adminRouter.get("/my-earning/get", earning.get)
 
 adminRouter.get("/my-services/get", myServices.get);
+
+// sensor data get
+adminRouter.get("/location", sensor.get);
+
 
 // Export default
 export default adminRouter;

@@ -67,59 +67,6 @@ const store = async (req: any, res: Response) => {
         session.endSession();
         return response.sendSuccess(req, res, responseData);
 
-        // if (devicetoken) {
-
-        //     const data = await getData(devicetoken);
-        //     if (Object.keys(data).length !== 0 && data.constructor === Object) {
-        //         const updateData: any = [];
-        //         data.sensordata.map((key: any) => {
-        //             updateData.push(key);
-        //         })
-        //         sensordata.map((key: any) => {
-        //             updateData.push(key);
-        //         })
-
-        //         await SensorModel.findOneAndUpdate({devicetoken: devicetoken}, { $set: { sensordata: updateData, address: address ? address :  data.address }});
-        //         const responseData = {
-        //             message: process.env.APP_SUCCESS_MESSAGE,
-        //             data: await getData(devicetoken)
-        //         };
-
-        //         await session.commitTransaction();
-        //         session.endSession();
-        //         return response.sendSuccess(req, res, responseData);
-
-        //     } else {
-        //         const sensorReq: any = await SensorModel.create(sensorData);
-        //         if (!sensorReq) {
-        //             const sendResponse: any = {
-        //                 message: process.env.APP_SR_NOT_MESSAGE,
-        //             };
-        //             return response.sendError(res, sendResponse);
-        //         }
-        //         const responseData = {
-        //             message: process.env.APP_SUCCESS_MESSAGE,
-        //             data: sensorReq
-        //         };
-
-        //         await session.commitTransaction();
-        //         session.endSession();
-        //         return response.sendSuccess(req, res, responseData);
-        //     }
-
-        //     // const responseData: any = {
-        //     //     message: 'Sensor data' + process.env.APP_UPDATE_MESSAGE,
-        //     //     data: await getData(devicetoken),
-        //     // };
-        //     // await session.commitTransaction();
-        //     // session.endSession();
-        //     // return response.sendSuccess(req, res, responseData);
-
-        // }
-
-        // await session.commitTransaction();
-        // await session.endSession();
-
     } catch (err: any) {
         const sendResponse: any = {
             message: err.message,
@@ -178,6 +125,96 @@ const getSensorData = async (req: any, res: Response) => {
     }
 };
 
+const get = (async (req: any, res: Response) => {    
+    const session: any = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        const { per_page, page, sort_field, sort_direction, type } = req.query;
+        let filterText: object = {
+            type: type,
+        };
+        let filter: any = req.query.search;
+        filter = filter ? filter.replace(" 91", "") : "";
+        filter = filter ? filter.replace("%", "") : "";
+
+        let filterTextValue: any = filter;
+        let orders: any = {};
+        let pageFind = page ? (Number(page) - 1) : 0;
+        let perPage: number = per_page == undefined ? 10 : Number(per_page)
+        if (sort_field) {
+            orders[sort_field as string] = sort_direction == "ascend" ? 1 : -1;
+        } else {
+            orders = { 'createdAt': -1 };
+        }
+
+        if (filterTextValue) {
+            let filterTextField: any = []
+            await allFiled.map(function async(filed: any) {
+                let filedData = {
+                    [filed]: {
+                        $regex: `${filterTextValue}`, $options: "i"
+                    }
+                }
+                filterTextField.push(filedData);
+            })
+
+            filterText = {
+                ...filterText,
+                $or: filterTextField
+            };
+        }
+
+        const sensorData: any = await SensorModel.aggregate([
+            {
+                $addFields: {
+                    "_id": { $toString: "$_id" }
+                }
+            },
+            { $project: project },
+            { $match: filterText },
+            { $sort: orders },
+            {
+                $facet: {
+                    total: [{ $count: 'createdAt' }],
+                    docs: [{ $addFields: { _id: '$_id' } }],
+                },
+            },
+            { $unwind: '$total' },
+            {
+                $project: {
+                    docs: {
+                        $slice: ['$docs', perPage * pageFind, {
+                            $ifNull: [perPage, '$total.createdAt']
+                        }]
+                    },
+                    total: '$total.createdAt',
+                    limit: { $literal: perPage },
+                    page: { $literal: (pageFind + 1) },
+                    pages: { $ceil: { $divide: ['$total.createdAt', perPage] } },
+                },
+            },
+        ]);
+
+        const sendResponse: any = {
+            message: process.env.APP_GET_MESSAGE,
+            data: sensorData.length > 0 ? sensorData[0] : {},
+        };
+        await session.commitTransaction();
+        session.endSession();
+        return response.sendSuccess(req, res, sendResponse);
+    } catch (err: any) {
+        const sendResponse: any = {
+            message: err.message,
+        }
+        logger.info('Sensor' + ' ' + process.env.APP_GET_MESSAGE);
+        logger.info(err);
+        await session.abortTransaction();
+        session.endSession();
+        return response.sendError(res, sendResponse);
+    }
+
+})
+
 const destroy = (async (req: any, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
@@ -185,7 +222,7 @@ const destroy = (async (req: any, res: Response) => {
     try {
         await SensorModel.deleteMany({ devicetoken: devicetoken, })
         const responseData: any = {
-            message: 'Sensor' + process.env.APP_DELETE_MESSAGE,
+            message: 'Sensor' + ' ' + process.env.APP_DELETE_MESSAGE,
             data: [],
         };
         await session.commitTransaction();
@@ -195,7 +232,7 @@ const destroy = (async (req: any, res: Response) => {
         const sendResponse: any = {
             message: err.message,
         }
-        logger.info('Sensor' + process.env.APP_DELETE_MESSAGE);
+        logger.info('Sensor' + ' ' + process.env.APP_DELETE_MESSAGE);
         logger.info(err);
         await session.abortTransaction();
         session.endSession();
@@ -207,5 +244,6 @@ const destroy = (async (req: any, res: Response) => {
 export default {
     store,
     getSensorData,
+    get,
     destroy
 };

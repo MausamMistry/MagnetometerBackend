@@ -127,32 +127,10 @@ const get = (async (req: Request, res: Response) => {
                 ...filterText,
                 $or: filterTextField
             };
-
-            // console.log(filterTextValue)
-            
-            // if (mongoose.Types.ObjectId.isValid(filterTextValue)) {
-            //     filterText = {
-            //         $or: [
-            //             { _id: new mongoose.Types.ObjectId(filterTextValue) },
-            //         ],
-            //     }
-            // }
             console.log(filterText)
         }
 
         const userData: any = await AdminsModel.aggregate([
-
-            // {
-            //     $lookup: {
-            //         from: "service_types",
-            //         localField: "service_type_id",
-            //         foreignField: "_id",
-            //         as: "serviceTypeData",
-            //     },
-            // },
-            // {
-            //     $unwind: { path: "$serviceTypeData", preserveNullAndEmptyArrays: true },
-            // },
             {
                 $addFields: {
                     "_id": { $toString: "$_id" }
