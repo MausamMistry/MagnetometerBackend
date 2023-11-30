@@ -250,7 +250,7 @@ const edit = (async (req: Request, res: Response) => {
     try {
         let id: any = req.query.id;
         const responseData: any = {
-            message: 'User' + process.env.APP_EDIT_GET_MESSAGE,
+            message: 'User' + ' ' + process.env.APP_EDIT_GET_MESSAGE,
             data: await getData(id),
         };
         await session.commitTransaction();
@@ -260,7 +260,7 @@ const edit = (async (req: Request, res: Response) => {
         const sendResponse: any = {
             message: err.message,
         }
-        logger.info('User' + process.env.APP_EDIT_GET_MESSAGE);
+        logger.info('User' + ' ' + process.env.APP_EDIT_GET_MESSAGE);
         logger.info(err);
         await session.abortTransaction();
         session.endSession();

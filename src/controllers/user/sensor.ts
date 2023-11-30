@@ -29,7 +29,7 @@ const getData = (async (devicetoken: any) => {
     const sensorDatas: any = await SensorModel.aggregate([
         { $match: { "devicetoken": devicetoken } },
         { $project: project }
-    ]);    
+    ]);
     return sensorDatas.length > 0 ? sensorDatas[0] : {};
 });
 
@@ -120,11 +120,16 @@ const getSensorData = async (req: any, res: Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { devicetoken, address } = req.body;
+        const { devicetoken } = req.body;
 
         const matchStage = {
-            $match: { $or: [{ devicetoken: devicetoken }, { address: address }] }
+            $match: { devicetoken: devicetoken }
         };
+
+        // const matchStage = {
+        //     $match: { $or: [{ devicetoken: devicetoken }, { address: address }] }
+        // };
+
 
         const pipeline = [
             matchStage
