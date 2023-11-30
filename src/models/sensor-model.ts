@@ -7,7 +7,8 @@ export interface ISensorModel {
     sensordata: {}[];
     devicetoken: string;
     address: string;
-    updated_by:string
+    updated_by:string,
+    day:number
 }
 
 const schema = new Schema<ISensorModel>(
@@ -16,7 +17,8 @@ const schema = new Schema<ISensorModel>(
         sensordata: { type: Schema.Types.Mixed },
         devicetoken: { type: String },
         address: { type: String },
-        updated_by:{ type: String }
+        updated_by:{ type: String },
+        day: { type: Number }
     },
     {
         timestamps: true,

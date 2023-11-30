@@ -12,7 +12,8 @@ const allFiled = [
     "_id",
     "devicetoken",
     "sensordata",
-    "address"
+    "address",
+    "createdAt"
 ]
 let project: any = {}
 
@@ -42,13 +43,15 @@ const store = async (req: any, res: Response) => {
         const {
             sensordata,
             address,
-            devicetoken
+            devicetoken,
+            day
         } = req.body;
 
         const sensorData = {
             sensordata: sensordata,
             address: address,
-            devicetoken: devicetoken
+            devicetoken: devicetoken,
+            day
         }
 
         const sensorReq: any = await SensorModel.create(sensorData);
@@ -83,15 +86,19 @@ const getSensorData = async (req: any, res: Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { devicetoken } = req.body;
+        const { devicetoken, sort } = req.body;
 
-        const matchStage = {
-            $match: { devicetoken: devicetoken }
-        };
+        // const matchStage = {
+        //     $match: { devicetoken: devicetoken }
+        // };
 
         // const matchStage = {
         //     $match: { $or: [{ devicetoken: devicetoken }, { address: address }] }
         // };
+
+        const matchStage = {
+            $match: { $and: [{ devicetoken: devicetoken }, { day: sort }] }
+        };
 
 
         const pipeline = [
@@ -164,6 +171,7 @@ const get = (async (req: any, res: Response) => {
             };
         }
 
+
         const sensorData: any = await SensorModel.aggregate([
             {
                 $addFields: {
@@ -194,6 +202,9 @@ const get = (async (req: any, res: Response) => {
                 },
             },
         ]);
+
+        console.log("sensorData", sensorData);
+        
 
         const sendResponse: any = {
             message: process.env.APP_GET_MESSAGE,
