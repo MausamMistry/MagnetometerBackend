@@ -13,7 +13,8 @@ const allFiled = [
     "devicetoken",
     "sensordata",
     "address",
-    "createdAt"
+    "createdAt",
+    "day"
 ]
 let project: any = {}
 
@@ -87,27 +88,13 @@ const getSensorData = async (req: any, res: Response) => {
     session.startTransaction();
     try {
         const { devicetoken, sort } = req.body;
-
-        // const matchStage = {
-        //     $match: { devicetoken: devicetoken }
-        // };
-
-        // const matchStage = {
-        //     $match: { $or: [{ devicetoken: devicetoken }, { address: address }] }
-        // };
-
-        const matchStage = {
-            $match: { $and: [{ devicetoken: devicetoken }, { day: sort }] }
-        };
-
-
-        const pipeline = [
-            matchStage
-        ];
-
-        let sensorData = await SensorModel.aggregate(pipeline).exec();
+        let sensorData = await SensorModel.aggregate([
+            { $match: { $and: [ { "devicetoken": devicetoken }, { "day": sort}]} },
+            { $project: project },
+            { $sort: {'createdAt': -1 }}
+        ]).exec();
+        
         sensorData = JSON.parse(JSON.stringify(sensorData));
-
         if (!sensorData[0]) {
             const responseData: any = {
                 message: "Data not Found.",
