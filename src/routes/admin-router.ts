@@ -330,8 +330,8 @@ adminRouter.post("/our-contact-us/store", ourContactUsValidation.store, ourConta
 // ================================== Start cms Route =======================================
 // *******************************************************************************************
 
-adminRouter.get("/cms/get", cmsService.get);
-adminRouter.post("/cms/store", cmsValidation.store, cmsService.store);
+// adminRouter.get("/cms/get", cmsService.get);
+// adminRouter.post("/cms/store", cmsValidation.store, cmsService.store);
 
 // *******************************************************************************************
 // ================================== End cms Route =========================================

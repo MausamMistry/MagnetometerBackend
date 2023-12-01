@@ -1972,7 +1972,7 @@ const getCms = async (req: Request, res: Response) => {
         await session.commitTransaction();
         await session.endSession();
         const responseData: any = {
-            message: process.env.APP_CMS_GET,
+            message: 'Cms' + ' ' + process.env.APP_GET_MESSAGE,
             data: cmsData,
         };
 

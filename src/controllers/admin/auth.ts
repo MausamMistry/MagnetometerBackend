@@ -187,7 +187,7 @@ const dashboard = (async (req: Request, res: Response) => {
 
 
 const adminsDataGet = (async (id: any) => {
-    const adminData: any = await Admin.findById(id).select("_id first_name last_name email role_id profile_photo")
+    const adminData: any = await Admin.findById(id).select("_id first_name last_name email role_id profile_photo is_admin")
     return adminData;
 })
 const login = (async (req: Request, res: Response) => {
@@ -229,8 +229,10 @@ const login = (async (req: Request, res: Response) => {
                 AdminsData['access_token'] = token;
                 const sendResponse: any = {
                     data: AdminsData ? AdminsData : {},
+                    status: 200,
                     message: process.env.APP_LOGGED_MESSAGE,
                 }
+                
                 return response.sendSuccess(req, res, sendResponse);
             }
         } else {

@@ -32,9 +32,9 @@ const sendValidationError = (async (res: any, error: any) => {
 
 
 const sendSuccess = (async (req: any, res: any, data: any) => {
+    
     let dataResponse = {
-        "code": 200,
-        "status": "success",
+        "status": 200,
         "message": data.message,
         "data": data.data
     }
@@ -43,8 +43,7 @@ const sendSuccess = (async (req: any, res: any, data: any) => {
 });
 const sendResponse = (async (res: any, data: any) => {
     let dataResponse = {
-        "code": 200,
-        "status": "success",
+        "status": 200,
         "message": data.message,
         "data": data.data
     }

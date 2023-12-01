@@ -14,6 +14,8 @@ import Cms from '../../models/cms-model';
 // =========================== Get Data With Pagination And Filter ===========================
 // *******************************************************************************************
 const get = (async (req: Request, res: Response) => {
+    console.log("process.env.APP_GET_MESSAGE", process.env.APP_GET_MESSAGE);
+    
     try {
         const data: any = await Cms.find();
         let fees_map: any = {};
@@ -21,14 +23,17 @@ const get = (async (req: Request, res: Response) => {
             values.key, values.value
         ]));
         let feesMapArray: any = await Object.fromEntries(fees_map.entries());
-
+        console.log("process.env.APP_GET_MESSAGE", process.env.APP_GET_MESSAGE);
+        
         const sendResponse: any = {
             data: feesMapArray ? feesMapArray : {},
-            message: 'CMS' + process.env.APP_GET_MESSAGE,
+            message: 'CMS' + ' ' + process.env.APP_GET_MESSAGE,
         }
         return response.sendSuccess(req, res, sendResponse);
 
     } catch (err: any) {
+        console.log("process.env.APP_GET_MESSAGE", process.env.APP_GET_MESSAGE);
+        
         const sendResponse: any = {
             message: err.message,
         }
@@ -58,11 +63,13 @@ const store = (async (req: Request, res: Response) => {
         await Cms.updateOne({ key: 'VIBRATION' }, { $set: { value: vibration } });
         await Cms.updateOne({ key: 'CALIBRATION' }, { $set: { value: calibration } });
 
-        await session.commitTransaction();
-        await session.endSession();
+        
         const sendResponse: any = {
+            status: 200,
             message: 'CMS' + ' ' + process.env.APP_UPDATE_MESSAGE
         };
+        await session.commitTransaction();
+        await session.endSession();
         return response.sendSuccess(req, res, sendResponse);
 
     } catch (err: any) {
