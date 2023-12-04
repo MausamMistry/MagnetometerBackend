@@ -262,12 +262,11 @@ const changePassword = (async (req: Request, res: Response) => {
         });
         if (adminData) {
             const isComparePassword: any = await bcrypt.compare(old_password, adminData.password);
-
-            // return
+            
             if (isComparePassword) {
                 if(old_password === password) {
                     const sendResponse: any = {
-                        message: process.env.APP_INVALID_PASSWORD_MESSAGE,
+                        message: process.env.APP_PASSWROD_DIFFERENT_MESSAGE,
                     }
                     return response.sendSuccess(req, res, sendResponse);
                 } else {
@@ -398,6 +397,8 @@ const logout = (async (req: Request, res: Response) => {
 })
 
 const forgetPassword = async (req: Request, res: Response) => {
+    console.log("hello world forget password >>>>>>>>>>>>>>>>>");
+    
     try {
         const { email } = req.body;
 
@@ -405,7 +406,7 @@ const forgetPassword = async (req: Request, res: Response) => {
 
         if (!admin) {
             const sendResponse: any = {
-                message: process.env.APP_ADMIN_NOT_MESSAGE,
+                message: process.env.APP_ADMIN_NOT_FOUND_MESSAGE,
             };
             return response.sendError(res, sendResponse);
         }
