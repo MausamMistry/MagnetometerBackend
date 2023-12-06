@@ -71,6 +71,21 @@ import whyMaintenance from "../controllers/admin/whyMaintenance";
 import whyMaintenanceValidation from "../validation/admin/whyMaintenance-validation";
 import sensor from "../controllers/user/sensor";
 
+import multer from "multer";
+import path from "path";
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads'); // Destination folder for uploaded files
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    },
+});
+
+const upload = multer({ storage: storage });
+
 // Constants
 const adminRouter = Router();
 adminRouter.use(decMiddleware.DecryptedData);
@@ -79,10 +94,9 @@ adminRouter.use(authAdmin);
 adminRouter.get("/dashboard", authService.dashboard);
 adminRouter.post("/change-password", authService.changePassword);
 adminRouter.post("/logout", authService.logout);
-adminRouter.post("/profile-update", authService.updateProfile);
+adminRouter.post("/profile-update", upload.single("file"), authService.updateProfile);
 adminRouter.get("/profile", authService.getProfile);
-
-
+adminRouter.post('/imageupload', upload.single("file"), authService.updateImage);
 
 
 // *******************************************************************************************
@@ -118,7 +132,7 @@ adminRouter.post("/social-media/change-status", commonValidation.idRequired, soc
 //why maintenance master
 
 adminRouter.get("/why-maintenance-master/get", whyMaintenance.get);
-adminRouter.post("/why-maintenance-master/store",whyMaintenanceValidation.store ,whyMaintenance.store);
+adminRouter.post("/why-maintenance-master/store", whyMaintenanceValidation.store, whyMaintenance.store);
 adminRouter.get("/why-maintenance-master/edit-get", commonValidation.idRequiredQuery, whyMaintenance.edit);
 adminRouter.delete("/why-maintenance-master/delete", commonValidation.idRequiredQuery, whyMaintenance.destroy);
 // adminRouter.post("/why-maintenance-master/change-status", commonValidation.idRequired, whyMaintenance.changeStatus);
