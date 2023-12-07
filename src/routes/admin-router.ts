@@ -94,9 +94,8 @@ adminRouter.use(authAdmin);
 adminRouter.get("/dashboard", authService.dashboard);
 adminRouter.post("/change-password", authService.changePassword);
 adminRouter.post("/logout", authService.logout);
-adminRouter.post("/profile-update", upload.single("file"), authService.updateProfile);
+adminRouter.post("/profile-update", authService.updateProfile);
 adminRouter.get("/profile", authService.getProfile);
-adminRouter.post('/imageupload', upload.single("file"), authService.updateImage);
 
 
 // *******************************************************************************************

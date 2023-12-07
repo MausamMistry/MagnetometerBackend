@@ -113,7 +113,6 @@ const get = (async (req: Request, res: Response) => {
                 ...filterText,
                 $or: filterTextField
             };
-            console.log(filterText)
         }
 
         const userData: any = await AdminsModel.aggregate([
@@ -242,10 +241,10 @@ const changeStatus = (async (req: Request, res: Response) => {
     try {
         let id: number = req.body.id;
         let status: string = req.body.status;
-        const userData: any = await User.findOne({ _id: id });
+        const userData: any = await AdminsModel.findOne({ _id: id });
         userData.is_active = status;
         await userData.save();
-        const message: string = `User status ${(status === "true") ? 'Approved' : 'Rejected'} successfully`
+        const message: string = `Sub-admin status ${(status === "true") ? 'Approved' : 'Rejected'} successfully`
         const responseData: any = {
             message: message,
             data: true,

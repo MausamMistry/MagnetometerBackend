@@ -333,11 +333,11 @@ const getProfile = (async (req: Request, res: Response) => {
 
 const updateProfile = (async (req: Request, res: Response) => {
     try {
-        const { first_name, last_name, email, profile_photo, mobile_no } = req.body;
+        const { first_name, last_name, email, profile_photo, mobile_no } = req.body;        
         // @ts-ignore
         const admin_id = req?.admin?._id;
         await Admin.findByIdAndUpdate(admin_id, {
-            profile_photo: req.files,
+            profile_photo: profile_photo,
             first_name: first_name,
             last_name: last_name,
             email: email,
@@ -346,35 +346,6 @@ const updateProfile = (async (req: Request, res: Response) => {
         const adminData: any = await Admin.findOne({
             _id: new mongoose.Types.ObjectId(admin_id)
         });
-        const sendResponse: any = {
-            data: adminData,
-            message: process.env.APP_PROFILE_UPDATE_MESSAGE,
-        }
-        return response.sendSuccess(req, res, sendResponse);
-    } catch (err: any) {
-        const sendResponse: any = {
-            message: err.message,
-        }
-        logger.info(process.env.APP_PROFILE_UPDATE_MESSAGE);
-        logger.info(err);
-        return response.sendError(res, sendResponse);
-    }
-})
-
-const updateImage = (async (req: Request, res: Response) => {
-    try {
-        
-        // @ts-ignore
-        const admin_id = req?.admin?._id;
-        if(req.file) {
-            req.file.path = 'http://103.154.184.187:5006/' + req.file.path;
-        }
-        
-        await Admin.updateOne({ _id: new mongoose.Types.ObjectId(admin_id) }, { $set: { profile_photo: req.file } });
-        const adminData: any = await Admin.findOne({
-            _id: new mongoose.Types.ObjectId(admin_id)
-        });
-        
         const sendResponse: any = {
             data: adminData,
             message: process.env.APP_PROFILE_UPDATE_MESSAGE,
@@ -552,7 +523,6 @@ export default {
     getProfile,
     dashboard,
     updateProfile,
-    updateImage,
     forgetPassword,
     resetPassword,
     logout
