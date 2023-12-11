@@ -375,7 +375,7 @@ const login = async (req: Request, res: Response) => {
 		if (userData) {
 			if (!userData.password) {
 				const sendResponse: any = {
-					message: process.env.APP_INVALID_PASSWORD_MESSAGE,
+					message: process.env.APP_INVALID_PASSWORD,
 				};
 				return response.sendError(res, sendResponse);
 			}
@@ -393,7 +393,7 @@ const login = async (req: Request, res: Response) => {
 
 			if (!ispasswordmatch) {
 				const sendResponse: any = {
-					message: process.env.APP_INVALID_PASSWORD_MESSAGE,
+					message: process.env.APP_WRONG_PASSWORD_MESSAGE,
 				};
 				return response.sendError(res, sendResponse);
 			} else {
