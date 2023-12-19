@@ -89,11 +89,11 @@ const getSensorData = async (req: any, res: Response) => {
     try {
         const { devicetoken, sort } = req.body;
         let sensorData = await SensorModel.aggregate([
-            { $match: { $and: [ { "devicetoken": devicetoken }, { "day": sort}]} },
+            { $match: { $and: [{ "devicetoken": devicetoken }, { "day": sort }] } },
             { $project: project },
-            { $sort: {'createdAt': -1 }}
+            { $sort: { 'createdAt': -1 } }
         ]).exec();
-        
+
         sensorData = JSON.parse(JSON.stringify(sensorData));
         if (!sensorData[0]) {
             const responseData: any = {
@@ -106,7 +106,6 @@ const getSensorData = async (req: any, res: Response) => {
             message: "Sensor Details get successfully",
             data: sensorData,
         };
-
         return await response.sendSuccess(req, res, responseData);
     } catch (err: any) {
         const sendResponse: any = {
@@ -119,7 +118,7 @@ const getSensorData = async (req: any, res: Response) => {
     }
 };
 
-const get = (async (req: any, res: Response) => {    
+const get = (async (req: any, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -191,7 +190,7 @@ const get = (async (req: any, res: Response) => {
         ]);
 
         console.log("sensorData", sensorData);
-        
+
 
         const sendResponse: any = {
             message: process.env.APP_GET_MESSAGE,
@@ -238,10 +237,48 @@ const destroy = (async (req: any, res: Response) => {
     }
 })
 
+const deleteSensorDataPassedDays = (async () => {
+    const session: any = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        console.log('data deletd ........');
+        
+        const currDate = new Date();
+        const year = currDate.getFullYear();
+        let month: any = currDate.getMonth() + 1;
+
+        let day: any = currDate.getDate();
+        let hours: any = currDate.getHours();
+        let minutes: any = currDate.getMinutes();
+
+        let seconds: any = currDate.getSeconds();
+        month = month.toString().length < 2 ? `0${month}` : month;
+        day = day.toString().length < 2 ? `0${day}` : day;
+
+        hours = hours.toString().length < 2 ? `0${hours}` : hours;
+        minutes = minutes.toString().length < 2 ? `0${minutes}` : minutes;
+        seconds = seconds.toString().length < 2 ? `0${seconds}` : seconds;
+
+        const currentDateTime = `${hours}:${minutes}:${seconds}`;
+        let earlierDate: any = `${year}-${month}-${day - 7}`;
+        earlierDate = earlierDate + " " + currentDateTime;
+
+        await SensorModel.deleteMany({ createdAt: { $lte: earlierDate }});
+        
+        await session.commitTransaction();
+        session.endSession();
+    } catch (err: any) {
+        logger.info('Sensor Data' + process.env.APP_DELETE_MESSAGE);
+        logger.info(err);
+        await session.abortTransaction();
+        session.endSession();
+    }
+})
 
 export default {
     store,
     getSensorData,
     get,
-    destroy
+    destroy,
+    deleteSensorDataPassedDays
 };

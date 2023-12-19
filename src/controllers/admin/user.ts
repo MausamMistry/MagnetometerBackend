@@ -516,8 +516,10 @@ const sendNotification = (async (req: Request, res: Response) => {
         const token = req.body.token;
         
         const notification = await sendPushNotification(token, {});
+        console.log('notification', notification);
+        
         const sendResponse: any = {
-            message: 'User' + process.env.APP_GET_MESSAGE,
+            message: 'Sent notification to user',
             data: "" //data.length > 0 ? data : {},
         };
         await session.commitTransaction();

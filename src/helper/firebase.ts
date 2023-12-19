@@ -1,16 +1,17 @@
 import admin from "firebase-admin";
-import { initializeApp } from 'firebase-admin/app';
+// import { initializeApp } from 'firebase-admin/app';
 import log4js from "log4js";
 const logger = log4js.getLogger();
+var serviceAccount = require('../quakemeup-b5167-firebase-adminsdk-36tlj-cafc8474f6.json');
 
-var serviceAccount = require("../maintenance-master-5145c-firebase-adminsdk-94pz4-54fff8a476.json");
-
-initializeApp({
+admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
 
 export const sendPushNotification = async (token: any, obj: any) => {
+    
     if (token.length) {
+
         // let dataSend: any = {
         //     "type": obj.data.type.toString(),
         //     "title": obj.data.title,
@@ -18,20 +19,22 @@ export const sendPushNotification = async (token: any, obj: any) => {
         //     "updatedAt": obj.data.updatedAt,
         //     "data": obj.data.extraData
         // }
+
         let dataSend: any = {
-            "type": obj.data.type.toString(),
-            "title": obj.data.title,
-            "updatedAt": obj.data.updatedAt,
+            "type": 'type', // obj.data.type.toString(),
+            "title": 'title', // obj.data.title,
+            "message": 'message',
+            "updatedAt": 'updatedAt' // obj.data.updatedAt,
         }
 
         await admin.messaging().sendMulticast({
             data: dataSend,
             notification: {
-                title: obj.data.title,
+                title: 'notification sent to cast ..............', // obj.data.title,
                 // body: obj.data.message,
-                body: ''
+                body: 'body'
             },
-            tokens: token,
+            tokens: token
         }).then((value) => {
             console.log('Successfully sent message:', value);
             console.log(value.responses);

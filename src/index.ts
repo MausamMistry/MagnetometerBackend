@@ -8,6 +8,7 @@ const log4js = require("log4js");
 const mongoose = require("mongoose");
 import indexRouter from "./routes/index";
 import cronService from "./controllers/common/cron";
+import sensor from "./controllers/user/sensor";
 const morgan = require("morgan");
 
 // config();
@@ -85,11 +86,11 @@ cron.schedule("0 0 */3 * *", async () => {
 });
 
 // daily data base backup and send email
-cron.schedule("15 0 * * *", async () => {
-    await cronService.databaseBackup();
-    await cronService.autoCancelledAfter12Month();
-    await cronService.serviceAutoCancelAfter30Day();
-});
+// cron.schedule("15 0 * * *", async () => {
+//     await cronService.databaseBackup();
+//     await cronService.autoCancelledAfter12Month();
+//     await cronService.serviceAutoCancelAfter30Day();
+// });
 
 // cron.schedule("* * * * *", async () => {
 //     // all monite after delete this 
@@ -98,17 +99,19 @@ cron.schedule("15 0 * * *", async () => {
 
 // Cron job every night at midnight is a commonly used cron schedule.
 
-cron.schedule("0 0 * * *", async () => {
-    await cronService.serviceAutoClose();
-    await cronService.destroyToken(); // remove auto token 
-    console.log("Database device token  delete ");
-    console.log("Cron job every night at midnight is a commonly used cron schedule.  ");
+// cron.schedule("0 0 * * *", async () => {
+//     await cronService.serviceAutoClose();
+//     await cronService.destroyToken(); // remove auto token 
+//     console.log("Database device token  delete ");
+//     console.log("Cron job every night at midnight is a commonly used cron schedule.  ");
+// });
+
+cron.schedule('0 0 * * SUN', async () => {
+    // await cronService.serviceAutoCancelAfter30Day();
+    await sensor.deleteSensorDataPassedDays();
+    console.log('cronjob');
 });
 
-// cron.schedule("* * * * *", async () => {
-//     await cronService.serviceAutoCancelAfter30Day();
-//     console.log('cronjob')
-// });
 // cron.schedule("* * * * * *", async () => {
 //     await cronService.randomDataUpdate();
 // // update data here
