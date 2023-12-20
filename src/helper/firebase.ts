@@ -11,28 +11,16 @@ admin.initializeApp({
 export const sendPushNotification = async (token: any, obj: any) => {
     
     if (token.length) {
-
-        // let dataSend: any = {
-        //     "type": obj.data.type.toString(),
-        //     "title": obj.data.title,
-        //     "message": obj.data.message,
-        //     "updatedAt": obj.data.updatedAt,
-        //     "data": obj.data.extraData
-        // }
-
         let dataSend: any = {
-            "type": 'type', // obj.data.type.toString(),
-            "title": 'title', // obj.data.title,
-            "message": 'message',
-            "updatedAt": 'updatedAt' // obj.data.updatedAt,
+            "title": obj.title,
+            "message": obj.notification_body
         }
 
         await admin.messaging().sendMulticast({
             data: dataSend,
             notification: {
-                title: 'notification sent to cast ..............', // obj.data.title,
-                // body: obj.data.message,
-                body: 'body'
+                title: obj.title,
+                body: obj.notification_body
             },
             tokens: token
         }).then((value) => {

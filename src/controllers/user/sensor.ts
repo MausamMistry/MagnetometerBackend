@@ -189,9 +189,6 @@ const get = (async (req: any, res: Response) => {
             },
         ]);
 
-        console.log("sensorData", sensorData);
-
-
         const sendResponse: any = {
             message: process.env.APP_GET_MESSAGE,
             data: sensorData.length > 0 ? sensorData[0] : {},
@@ -241,7 +238,6 @@ const deleteSensorDataPassedDays = (async () => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        console.log('data deletd ........');
         
         const currDate = new Date();
         const year = currDate.getFullYear();

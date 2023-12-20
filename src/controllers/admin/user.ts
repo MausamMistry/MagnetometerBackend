@@ -9,6 +9,7 @@ import RoleModel from '../../models/role-model';
 import { sendPushNotification } from '../../helper/firebase';
 import bcrypt from 'bcrypt'
 import uniqid from 'uniqid'
+import SensorModel from '../../models/sensor-model';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ============================================= Over Here Include Library =============================================
@@ -29,11 +30,24 @@ const allFiled = [
     "unique_id",
     "is_active"
 ]
-let project: any = {}
+
+const allSensorFiled = [
+    "_id",
+    "sensordata",
+    "devicetoken",
+    "address",
+    "day"
+]
+
+let project: any = {};
+let projectSensor: any = {};
 
 const getAllFiled = async () => {
     await allFiled.map(function async(item: any) {
         project[item] = 1;
+    })
+    await allSensorFiled.map(function async(item: any) {
+        projectSensor[item] = 1;
     })
 }
 
@@ -76,7 +90,7 @@ const getAll = (async (req: Request, res: Response) => {
 
 })
 
-const get = (async (req: Request, res: Response) => {    
+const get = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -145,7 +159,7 @@ const get = (async (req: Request, res: Response) => {
                 },
             },
         ]);
-        
+
         const sendResponse: any = {
             message: process.env.APP_GET_MESSAGE,
             data: userData.length > 0 ? userData[0] : {},
@@ -203,7 +217,7 @@ const getData = (async (id: number) => {
         { $match: { "_id": new mongoose.Types.ObjectId(id) } },
         { $project: project },
     ]);
-    
+
     return userData.length > 0 ? userData[0] : {};
 });
 
@@ -334,7 +348,7 @@ const store = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     var roleData: any = await RoleModel.findOne({ 'name': 'admin' });
-    
+
     try {
         // let id: number = req.body.id;
         const {
@@ -347,17 +361,17 @@ const store = (async (req: Request, res: Response) => {
         } = req.body;
         let userData: any = {}
         let message: any;
-        
+
         const query = {
-            $or: [{ email: email}, {mobile_no: mobile_no}]
+            $or: [{ email: email }, { mobile_no: mobile_no }]
         }
         userData = await AdminsModel.findOne(query);
-        
+
         if (userData) {
-            if(userData.email === email) {
+            if (userData.email === email) {
                 message = `User Already exists, with this email address, use different email!`;
             }
-            if(userData.mobile_no === mobile_no) {
+            if (userData.mobile_no === mobile_no) {
                 message = `User Already exists, with this mobie no, use different mobile no!`;
             }
             const responseData: any = {
@@ -387,7 +401,7 @@ const store = (async (req: Request, res: Response) => {
             message: message,
             data: await getData(userData._id),
         };
-        
+
         return response.sendSuccess(req, res, responseData);
 
     } catch (err: any) {
@@ -513,14 +527,32 @@ const sendNotification = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        const token = req.body.token;
+        const token: any = [];
+        const { location, title, notification_body } = req.body;
+        const obj = {
+            title: title,
+            notification_body: notification_body,
+        }
+
+        let sensorData = await SensorModel.aggregate([
+            { $match: { "_id": new mongoose.Types.ObjectId(location)} },
+            { $project: projectSensor },
+        ]).exec();
+        sensorData = JSON.parse(JSON.stringify(sensorData));
         
-        const notification = await sendPushNotification(token, {});
-        console.log('notification', notification);
-        
+        if (sensorData[0]) {
+            token.push(sensorData[0].devicetoken)
+        } else {
+            const responseData: any = {
+                message: "Data not Found.",
+            };
+            return await response.sendError(res, responseData);
+        }
+        await sendPushNotification(token, obj);
+
         const sendResponse: any = {
-            message: 'Sent notification to user',
-            data: "" //data.length > 0 ? data : {},
+            message: 'Notification sent to user',
+            data: {}
         };
         await session.commitTransaction();
         session.endSession();
