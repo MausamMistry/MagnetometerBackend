@@ -133,7 +133,7 @@ const get = (async (req: any, res: Response) => {
         let filterTextValue: any = filter;
         let orders: any = {};
         let pageFind = page ? (Number(page) - 1) : 0;
-        let perPage: number = per_page == undefined ? 10 : Number(per_page)
+        let perPage: number = per_page == undefined ? 10 : Number(per_page);
         if (sort_field) {
             orders[sort_field as string] = sort_direction == "ascend" ? 1 : -1;
         } else {
@@ -165,7 +165,7 @@ const get = (async (req: any, res: Response) => {
                 }
             },
             { $project: project },
-            { $match: filterText },
+            { $match: { $and: [filterText, { address: { $ne: 'Address not found' } }]} },
             { $sort: orders },
             {
                 $facet: {
@@ -174,19 +174,19 @@ const get = (async (req: any, res: Response) => {
                 },
             },
             { $unwind: '$total' },
-            {
-                $project: {
-                    docs: {
-                        $slice: ['$docs', perPage * pageFind, {
-                            $ifNull: [perPage, '$total.createdAt']
-                        }]
-                    },
-                    total: '$total.createdAt',
-                    limit: { $literal: perPage },
-                    page: { $literal: (pageFind + 1) },
-                    pages: { $ceil: { $divide: ['$total.createdAt', perPage] } },
-                },
-            },
+            // {
+            //     $project: {
+            //         docs: {
+            //             $slice: ['$docs', perPage * pageFind, {
+            //                 $ifNull: [perPage, '$total.createdAt']
+            //             }]
+            //         },
+            //         total: '$total.createdAt',
+            //         limit: { $literal: perPage },
+            //         page: { $literal: (pageFind + 1) },
+            //         pages: { $ceil: { $divide: ['$total.createdAt', perPage] } },
+            //     },
+            // },
         ]);
 
         const sendResponse: any = {

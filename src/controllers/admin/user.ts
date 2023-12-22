@@ -528,26 +528,49 @@ const sendNotification = (async (req: Request, res: Response) => {
     session.startTransaction();
     try {
         const token: any = [];
+        const address: any = [];
         const { location, title, notification_body } = req.body;
+
+        const arr = location.map((key: any) => {
+            return new mongoose.Types.ObjectId(key);
+        })
+        
         const obj = {
             title: title,
             notification_body: notification_body,
         }
 
         let sensorData = await SensorModel.aggregate([
-            { $match: { "_id": new mongoose.Types.ObjectId(location)} },
+            { $match: {_id: { "$in": arr } } },
             { $project: projectSensor },
         ]).exec();
         sensorData = JSON.parse(JSON.stringify(sensorData));
         
         if (sensorData[0]) {
-            token.push(sensorData[0].devicetoken)
-        } else {
+            sensorData.map(key => {
+                token.push(key.devicetoken);
+                address.push(key.address);
+            })
+        }
+
+        sensorData = await SensorModel.aggregate([
+            { $match: {address: { "$in": address } } },
+            { $project: projectSensor },
+        ]).exec();
+        sensorData = JSON.parse(JSON.stringify(sensorData));
+        
+        if (sensorData[0]) {
+            sensorData.map(key => {
+                token.push(key.devicetoken);
+            })
+        } 
+        else {
             const responseData: any = {
                 message: "Data not Found.",
             };
             return await response.sendError(res, responseData);
         }
+
         await sendPushNotification(token, obj);
 
         const sendResponse: any = {
