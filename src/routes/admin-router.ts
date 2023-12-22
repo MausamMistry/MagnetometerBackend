@@ -400,6 +400,7 @@ adminRouter.get("/my-services/get", myServices.get);
 
 // sensor data get
 adminRouter.get("/location", sensor.get);
+adminRouter.get("/sensordata", sensor.getWithPagination);
 
 
 // Export default

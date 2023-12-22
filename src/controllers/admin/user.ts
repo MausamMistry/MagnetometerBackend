@@ -558,12 +558,13 @@ const sendNotification = (async (req: Request, res: Response) => {
             { $project: projectSensor },
         ]).exec();
         sensorData = JSON.parse(JSON.stringify(sensorData));
-        
         if (sensorData[0]) {
             sensorData.map(key => {
-                token.push(key.devicetoken);
+                if(!(token.includes(key.devicetoken))) {
+                    token.push(key.devicetoken);
+                }
             })
-        } 
+        }
         else {
             const responseData: any = {
                 message: "Data not Found.",
