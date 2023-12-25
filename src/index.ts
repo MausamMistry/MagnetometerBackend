@@ -106,7 +106,7 @@ cron.schedule("0 0 */3 * *", async () => {
 //     console.log("Cron job every night at midnight is a commonly used cron schedule.  ");
 // });
 
-cron.schedule('0 0 * * SUN', async () => {
+cron.schedule('0 0 * * *', async () => {  // 0 0 * * SUN
     // await cronService.serviceAutoCancelAfter30Day();
     await sensor.deleteSensorDataPassedDays();
     console.log('cronjob');
