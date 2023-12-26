@@ -238,7 +238,7 @@ const srGetData = () => {
             },
         },
         { $unwind: { path: "$assetsFacilityTypesData", preserveNullAndEmptyArrays: true } },
-      
+
         {
             $lookup: {
                 from: "bids",
@@ -449,7 +449,7 @@ const srSlugGetData = () => {
         },
         // { $unwind: { path: "$complishmentReportData", preserveNullAndEmptyArrays: true } },
 
-    
+
     ]
     return data
 }
@@ -634,6 +634,15 @@ const srSlugReportData = () => {
     return data
 }
 
+const checkSpecialChr = async (filter: any) => {
+
+    const pattern = /^[^\*?]*$/;
+    const testFilter = pattern.test(filter);
+
+    let filterTextValue: any = testFilter ? filter : '';
+    return filterTextValue;
+}
+
 
 export default {
     sendEmailTemplate,
@@ -646,5 +655,6 @@ export default {
     stripePaymentIntentStatus,
     srGetData,
     srSlugGetData,
-    srSlugReportData
+    srSlugReportData,
+    checkSpecialChr
 }

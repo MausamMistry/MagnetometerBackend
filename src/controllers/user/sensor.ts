@@ -4,6 +4,7 @@ import response from "../../helper/responseMiddleware";
 import log4js from "log4js";
 const logger = log4js.getLogger();
 import SensorModel from "../../models/sensor-model";
+import commonFunction from "../../helper/commonFunction";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ===========================================  sensor Create on sensot Request =====================================//
@@ -208,7 +209,8 @@ const getWithPagination = (async (req: any, res: Response) => {
         filter = filter ? filter.replace(" 91", "") : "";
         filter = filter ? filter.replace("%", "") : "";
 
-        let filterTextValue: any = filter;
+        let filterTextValue: any = await commonFunction.checkSpecialChr(filter);
+
         let orders: any = {};
         let pageFind = page ? (Number(page) - 1) : 0;
         let perPage: number = per_page == undefined ? 10 : Number(per_page);
@@ -219,8 +221,8 @@ const getWithPagination = (async (req: any, res: Response) => {
         }
 
         if (filterTextValue) {
-            let filterTextField: any = []
-            await allFiled.map(function async(filed: any) {
+            const filterTextField: any = [];
+            await allFiled.map((filed: any) => {
                 let filedData = {
                     [filed]: {
                         $regex: `${filterTextValue}`, $options: "i"
@@ -316,7 +318,7 @@ const deleteSensorDataPassedDays = (async () => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        
+
         const currDate = new Date();
         const year = currDate.getFullYear();
         let month: any = currDate.getMonth() + 1;
@@ -337,8 +339,8 @@ const deleteSensorDataPassedDays = (async () => {
         let earlierDate: any = `${year}-${month}-${day - 7}`;
         earlierDate = earlierDate + " " + currentDateTime;
 
-        await SensorModel.deleteMany({ createdAt: { $lte: earlierDate }});
-        
+        await SensorModel.deleteMany({ createdAt: { $lte: earlierDate } });
+
         await session.commitTransaction();
         session.endSession();
     } catch (err: any) {

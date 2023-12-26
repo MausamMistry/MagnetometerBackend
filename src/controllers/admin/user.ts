@@ -10,6 +10,7 @@ import { sendPushNotification } from '../../helper/firebase';
 import bcrypt from 'bcrypt'
 import uniqid from 'uniqid'
 import SensorModel from '../../models/sensor-model';
+import commonFunction from '../../helper/commonFunction';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ============================================= Over Here Include Library =============================================
@@ -94,15 +95,13 @@ const get = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { per_page, page, sort_field, sort_direction, type } = req.query;
-        let filterText: object = {
-            type: type,
-        };
+        const { per_page, page, sort_field, sort_direction } = req.query;
+        let filterText: object = { };
         let filter: any = req.query.search;
         filter = filter ? filter.replace(" 91", "") : "";
         filter = filter ? filter.replace("%", "") : "";
 
-        let filterTextValue: any = filter;
+        let filterTextValue: any = await commonFunction.checkSpecialChr(filter);
         let orders: any = {};
         let pageFind = page ? (Number(page) - 1) : 0;
         let perPage: number = per_page == undefined ? 10 : Number(per_page)
@@ -113,8 +112,8 @@ const get = (async (req: Request, res: Response) => {
         }
 
         if (filterTextValue) {
-            let filterTextField: any = []
-            await allFiled.map(function async(filed: any) {
+            const filterTextField: any = []
+            await allFiled.map((filed: any) => {
                 let filedData = {
                     [filed]: {
                         $regex: `${filterTextValue}`, $options: "i"
@@ -127,6 +126,12 @@ const get = (async (req: Request, res: Response) => {
                 ...filterText,
                 $or: filterTextField
             };
+
+            if (mongoose.Types.ObjectId.isValid(filterTextValue)) {
+                filterText = {
+                    $or: [{ _id: new mongoose.Types.ObjectId(filterTextValue) }],
+                };
+            }
         }
 
         const userData: any = await AdminsModel.aggregate([
@@ -534,18 +539,18 @@ const sendNotification = (async (req: Request, res: Response) => {
         const arr = location.map((key: any) => {
             return new mongoose.Types.ObjectId(key);
         })
-        
+
         const obj = {
             title: title,
             notification_body: notification_body,
         }
 
         let sensorData = await SensorModel.aggregate([
-            { $match: {_id: { "$in": arr } } },
+            { $match: { _id: { "$in": arr } } },
             { $project: projectSensor },
         ]).exec();
         sensorData = JSON.parse(JSON.stringify(sensorData));
-        
+
         if (sensorData[0]) {
             sensorData.map(key => {
                 token.push(key.devicetoken);
@@ -554,13 +559,13 @@ const sendNotification = (async (req: Request, res: Response) => {
         }
 
         sensorData = await SensorModel.aggregate([
-            { $match: {address: { "$in": address } } },
+            { $match: { address: { "$in": address } } },
             { $project: projectSensor },
         ]).exec();
         sensorData = JSON.parse(JSON.stringify(sensorData));
         if (sensorData[0]) {
             sensorData.map(key => {
-                if(!(token.includes(key.devicetoken))) {
+                if (!(token.includes(key.devicetoken))) {
                     token.push(key.devicetoken);
                 }
             })
