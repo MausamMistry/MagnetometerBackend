@@ -1,11 +1,11 @@
 import log4js from "log4js";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 const logger = log4js.getLogger();
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 const nodemailer = require("nodemailer");
 const hbs = require('nodemailer-express-handlebars');
-const path = require('path');
+// const path = require('path');
 
 
 const sendEmail = ((msg: any) => {
@@ -27,36 +27,20 @@ const sendEmail = ((msg: any) => {
 
 const sendEmailTemplate = (async (data: any) => {
     try {
-        // let transporter = nodemailer.createTransport({
-        //     host: 'smtp.sendgrid.net',
-        //     port: 587,
-        //     auth: {
-        //         user: "apikey",
-        //         pass: process.env.SENDGRID_API_KEY
-        //     }
-        // })
-        // var transporter = nodemailer.createTransport({
-        //     host: "smtp.mailtrap.io",
-        //     port: 2525,
-        //     auth: {
-        //         user: "066b538e8236c0",
-        //         pass: "93517838974074"
-        //     }
-        // });
 
         let transporter = nodemailer.createTransport({
-            host: "mail.solutiontrackers.com",
-            port: 465,
-            secure: true, // true for 465, false for other ports
+            host: 'smtp.gmail.com',
+            port: 587, // 465,
+            secure: false, // true, // true for 465, false for other ports
             auth: {
-                user: "admin@solutiontrackers.com",
-                pass: "solution@2023#"   //app password for gmail
+                user: process.env.SENDER,
+                pass: process.env.PASS_KEY   //app password for gmail
             }
         });
 
         const pathUrl = process.env.APP_BASE_EMAIL_TEMP;
 
-        logger.info(process.env.SENDGRID_API_KEY)
+        // logger.info(process.env.SENDGRID_API_KEY)
         logger.info(pathUrl)
         const handlebarOptions = {
             viewEngine: {
@@ -72,7 +56,7 @@ const sendEmailTemplate = (async (data: any) => {
         const pathImg = pathUrl + `logo.png`;
 
         let attech = [{
-            filename: 'logo.jpg',
+            filename: 'logo.png',
             path: pathImg,
             cid: 'logo1' //same cid value as in the html img src
         }]
@@ -81,7 +65,7 @@ const sendEmailTemplate = (async (data: any) => {
             attech = [...attech, data.attachments]
         }
         var mailOptions = {
-            from: 'master.app.testing@gmail.com', // sender address
+            from: process.env.SENDER, // sender address
             to: data.to, // list of receivers
             subject: data.subject,
             template: data.template, // the name of the template file i.e email.handlebars
@@ -103,7 +87,6 @@ const sendEmailTemplate = (async (data: any) => {
     }
 
 });
-
 
 
 const makeIdString = ((length: any) => {
@@ -636,7 +619,7 @@ const srSlugReportData = () => {
 
 const checkSpecialChr = async (filter: any) => {
 
-    const pattern = /^[^\*?]*$/;
+    const pattern = /^[^*\?]*$/;
     const testFilter = pattern.test(filter);
 
     let filterTextValue: any = testFilter ? filter : '';

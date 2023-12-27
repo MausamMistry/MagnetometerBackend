@@ -96,7 +96,7 @@ const get = (async (req: Request, res: Response) => {
     session.startTransaction();
     try {
         const { per_page, page, sort_field, sort_direction } = req.query;
-        let filterText: object = { };
+        let filterText: object = {};
         let filter: any = req.query.search;
         filter = filter ? filter.replace(" 91", "") : "";
         filter = filter ? filter.replace("%", "") : "";
@@ -353,7 +353,7 @@ const store = (async (req: Request, res: Response) => {
     const session: any = await mongoose.startSession();
     session.startTransaction();
     var roleData: any = await RoleModel.findOne({ 'name': 'admin' });
-
+    
     try {
         // let id: number = req.body.id;
         const {
@@ -406,7 +406,29 @@ const store = (async (req: Request, res: Response) => {
             message: message,
             data: await getData(userData._id),
         };
+        let to: any = email;
+        let subject: any = process.env.APP_NAME + ' Welcome to the board';
+        let template: any = 'welcome-sub-admin';
+        let sendEmailTemplatedata: any = {
+            first_name: first_name,
+            last_name: last_name,
+            name: first_name + last_name,
+            password: password,
+            website_link: process.env.ADMIN_LINK,
+            // token: 'token',
+            app_name: process.env.APP_NAME,
+            // reset_button: process.env.ADMIN_LINK + 'reset-password/' + 'token',
+        }
 
+        let datta: any = {
+            to: to,
+            subject: subject,
+            template: template,
+            sendEmailTemplatedata: sendEmailTemplatedata
+        }
+
+        await commonFunction.sendEmailTemplate(datta)
+        
         return response.sendSuccess(req, res, responseData);
 
     } catch (err: any) {
