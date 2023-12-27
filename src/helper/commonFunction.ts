@@ -25,7 +25,7 @@ const sendEmail = ((msg: any) => {
     return true
 });
 
-const sendEmailTemplate = (async (data: any) => {
+const sendEmailTemplate = (async (data: any) => {    
     try {
 
         let transporter = nodemailer.createTransport({
@@ -33,13 +33,15 @@ const sendEmailTemplate = (async (data: any) => {
             port: 587, // 465,
             secure: false, // true, // true for 465, false for other ports
             auth: {
-                user: process.env.SENDER,
-                pass: process.env.PASS_KEY   //app password for gmail
+                user: 'sarmistha.ebiztrait@gmail.com', // process.env.SENDER,
+                pass: 'wwhqfasjbpghdajk' // process.env.PASS_KEY   //app password for gmail
             }
         });
 
         const pathUrl = process.env.APP_BASE_EMAIL_TEMP;
 
+        console.log('pathUrl', pathUrl);
+        
         // logger.info(process.env.SENDGRID_API_KEY)
         logger.info(pathUrl)
         const handlebarOptions = {
@@ -65,7 +67,7 @@ const sendEmailTemplate = (async (data: any) => {
             attech = [...attech, data.attachments]
         }
         var mailOptions = {
-            from: process.env.SENDER, // sender address
+            from: 'sarmistha.ebiztrait@gmail.com', // process.env.SENDER, // sender address
             to: data.to, // list of receivers
             subject: data.subject,
             template: data.template, // the name of the template file i.e email.handlebars
@@ -75,6 +77,8 @@ const sendEmailTemplate = (async (data: any) => {
         // trigger the sending of the E-mail
         await transporter.sendMail(mailOptions, function (error: any, info: any) {
             if (error) {
+                console.log('error', error);
+                
                 logger.info(error)
                 return true;
             }

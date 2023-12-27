@@ -238,8 +238,6 @@ const login = (async (req: Request, res: Response) => {
                     status: 200,
                     message: process.env.APP_LOGGED_MESSAGE,
                 }
-                console.log('sendResponse', sendResponse);
-                
                 return response.sendSuccess(req, res, sendResponse);
             }
         } else {
@@ -408,6 +406,7 @@ const forgetPassword = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
         const admin: any = await Admin.findOne({ email: email });
+        
         if (!admin) {
             const sendResponse: any = {
                 message: process.env.APP_ADMIN_NOT_FOUND_MESSAGE,
@@ -458,8 +457,12 @@ const forgetPassword = async (req: Request, res: Response) => {
                 template: template,
                 sendEmailTemplatedata: sendEmailTemplatedata
             }
+            const sendResponse = {
+                message: process.env.APP_PASSWROD,
+            }
 
             await CommonFunction.sendEmailTemplate(datta)
+            return response.sendSuccess(req, res, sendResponse);
         } catch (err) {
             logger.info(process.env.APP_ADMIN_NOT_MESSAGE);
             logger.info(err);
